@@ -1,4 +1,4 @@
-use crate::database;
+use crate::config::database;
 use crate::routes;
 use axum::Router;
 
