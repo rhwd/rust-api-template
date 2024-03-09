@@ -1,8 +1,8 @@
 use dotenv::dotenv;
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
+use sqlx::{postgres::PgPoolOptions, Pool};
 use std::sync::Arc;
 
-pub async fn connection() -> Arc<AppState<Postgres>> {
+pub async fn connection() {
     dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = match PgPoolOptions::new()
@@ -19,7 +19,7 @@ pub async fn connection() -> Arc<AppState<Postgres>> {
             std::process::exit(1);
         }
     };
-    Arc::new(AppState { db: pool })
+    Arc::new(AppState { db: pool });
 }
 
 pub struct AppState<D>
