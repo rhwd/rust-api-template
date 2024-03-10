@@ -1,7 +1,8 @@
 mod config;
 pub mod handlers;
 pub mod models;
-mod routes;
+pub mod routes;
+pub mod structs;
 pub mod utils;
 
 #[tokio::main]
