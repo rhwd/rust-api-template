@@ -23,20 +23,9 @@ pub async fn connection() -> Arc<AppState<Postgres>> {
     Arc::new(AppState { db: pool.clone() })
 }
 
-pub struct AppState<D>
+struct AppState<D>
 where
     D: sqlx::Database,
 {
     db: Pool<D>,
-}
-
-impl<D> Clone for AppState<D>
-where
-    D: sqlx::Database,
-{
-    fn clone(&self) -> Self {
-        Self {
-            db: self.db.clone(),
-        }
-    }
 }
