@@ -1,5 +1,8 @@
 mod config;
+pub mod handlers;
+pub mod models;
 mod routes;
+pub mod utils;
 
 #[tokio::main]
 async fn main() {
