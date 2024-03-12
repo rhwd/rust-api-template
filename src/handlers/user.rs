@@ -12,15 +12,24 @@ use serde_json::json;
 use std::sync::Arc;
 
 pub async fn get_one(
+    State(data): State<Arc<AppState>>,
     Path(id): Path<uuid::Uuid>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    let user = User {
-        id,
-        name: "Joe".to_string(),
-        email: "Joemail.com".to_string(),
-    };
-    let json_response = serde_json::json!(user);
-    Ok(Json(json_response))
+    let query_result = sqlx::query_as!(User, "SELECT * FROM users WHERE users.id = $1", id)
+        .fetch_one(&data.db)
+        .await;
+    match query_result {
+        Ok(user) => {
+            let user_response = json!(user);
+            return Ok((StatusCode::OK, Json(user_response)));
+        }
+        Err(e) => {
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({"status": "error","message": format!("{:?}", e)})),
+            ));
+        }
+    }
 }
 
 pub async fn create(
