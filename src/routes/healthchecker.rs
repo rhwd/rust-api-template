@@ -5,7 +5,7 @@ pub fn create_route() -> Router {
 }
 
 async fn health_checker_handler() -> impl IntoResponse {
-    const MESSAGE: &str = "API template built with Rust, SQLX, Postgres, and Axum";
+    const MESSAGE: &str = "API template built with Rust, SQLX, Postgres, and Axum.";
 
     let json_response = serde_json::json!({
         "status": "success",
