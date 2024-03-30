@@ -1,4 +1,4 @@
-use axum::{extract::FromRequestParts, http::request::Parts, RequestPartsExt};
+use axum::{async_trait, extract::FromRequestParts, http::request::Parts, RequestPartsExt};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
