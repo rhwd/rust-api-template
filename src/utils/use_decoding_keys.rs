@@ -1,13 +1,9 @@
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use once_cell::sync::Lazy;
-use rand::{
-    distributions::{Alphanumeric, DistString},
-    thread_rng,
-};
 
-pub struct Keys {
-    pub encoding: EncodingKey,
-    pub decoding: DecodingKey,
+struct Keys {
+    encoding: EncodingKey,
+    decoding: DecodingKey,
 }
 
 impl Keys {
@@ -19,7 +15,7 @@ impl Keys {
     }
 }
 
-pub static KEYS: Lazy<Keys> = Lazy::new(|| {
-    let secret = Alphanumeric.sample_string(&mut thread_rng(), 60);
+static KEYS: Lazy<Keys> = Lazy::new(|| {
+    let secret = Alphanumeric.sample_string(&mut rand::thread_rng(), 60);
     Keys::new(secret.as_bytes())
 });
