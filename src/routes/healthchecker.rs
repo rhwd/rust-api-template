@@ -1,5 +1,7 @@
 use axum::{response::IntoResponse, routing::get, Json, Router};
 
+use crate::utils::jwt_claim::Claims;
+
 pub fn create_route() -> Router {
     Router::new().route("/status", get(health_checker_handler))
 }
@@ -9,7 +11,8 @@ async fn health_checker_handler(claims: Claims) -> impl IntoResponse {
 
     let json_response = serde_json::json!({
         "status": "success",
-        "message": MESSAGE
+        "message": MESSAGE,
+        "claim": claims
     });
 
     Json(json_response)

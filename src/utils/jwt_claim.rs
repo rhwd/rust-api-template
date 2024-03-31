@@ -1,7 +1,16 @@
+use crate::utils::auth_errors::AuthError;
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts, RequestPartsExt};
+use axum_extra::{
+    headers::{authorization::Bearer, Authorization},
+    TypedHeader,
+};
+use jsonwebtoken::{decode, Validation};
 use serde::{Deserialize, Serialize};
 
+use super::use_decoding_keys::KEYS;
+
 #[derive(Debug, Serialize, Deserialize)]
+
 pub struct Claims {
     username: String,
     exp: usize,
