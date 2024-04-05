@@ -1,26 +1,27 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO users (name,email) VALUES ($1, $2) RETURNING *",
+  "query": "INSERT INTO users (name,email,password_hash) VALUES ($1, $2, $3) RETURNING name, email, id",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "id",
-        "type_info": "Uuid"
-      },
-      {
-        "ordinal": 1,
         "name": "name",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 2,
+        "ordinal": 1,
         "name": "email",
         "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "id",
+        "type_info": "Uuid"
       }
     ],
     "parameters": {
       "Left": [
+        "Varchar",
         "Varchar",
         "Varchar"
       ]
@@ -31,5 +32,5 @@
       false
     ]
   },
-  "hash": "9c856d093270e6097ea1da6c0ebdca92668c137ffb5bbac3c56bdb60d1c9fbc1"
+  "hash": "74ae7d9cddcf2650e4da3af560f7e5655642191b9a1c41dfafa62e4689c90509"
 }
