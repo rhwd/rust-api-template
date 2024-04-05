@@ -12,4 +12,5 @@ pub struct User {
 pub struct CreateUser {
     pub email: String,
     pub name: String,
+    pub password: String
 }
