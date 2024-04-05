@@ -15,7 +15,7 @@ pub async fn get_one(
     State(data): State<Arc<AppState>>,
     Path(id): Path<uuid::Uuid>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    let query_result = sqlx::query_as!(User, "SELECT * FROM users WHERE users.id = $1", id)
+    let query_result = sqlx::query_as!(User, "SELECT name, email, id FROM users WHERE users.id = $1", id)
         .fetch_one(&data.db)
         .await;
     match query_result {
@@ -36,11 +36,13 @@ pub async fn create(
     State(data): State<Arc<AppState>>,
     Json(body): Json<CreateUser>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    let password_hash = bcrypt::hash(body.password.to_string(), bcrypt::DEFAULT_COST).unwrap();
     let query_result = sqlx::query_as!(
         User,
-        "INSERT INTO users (name,email) VALUES ($1, $2) RETURNING *",
+        "INSERT INTO users (name,email,password_hash) VALUES ($1, $2, $3) RETURNING name, email, id",
         body.name.to_string(),
-        body.email.to_string()
+        body.email.to_string(),
+        password_hash
     )
     .fetch_one(&data.db)
     .await;
