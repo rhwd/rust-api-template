@@ -31,6 +31,9 @@ pub async fn get_one(
         }
     }
 }
+pub async fn authorize_user() -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    Ok((StatusCode::OK, Json(json!({"status": "ok"}))))
+}
 
 pub async fn create(
     State(data): State<Arc<AppState>>,
