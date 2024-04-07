@@ -19,3 +19,8 @@ pub struct LoginUser {
     pub email: String,
     pub password: String
 }
+
+pub struct CheckUserLogin {
+    pub email: String,
+    pub password_hash: String
+}
