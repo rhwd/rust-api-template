@@ -16,9 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Prepare
-      run: cargo sqlx prepare
-    - name: Build
-      run: cargo build --verbose
+    - name: Check
+      run: cargo check
     - name: Run tests
       run: cargo test --verbose
