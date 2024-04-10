@@ -1,6 +1,6 @@
 use crate::{
-    models::user::{CheckUserLogin, CreateUser, LoginUser, User},
-    structs::app_state::AppState,
+    models::user::{ CheckUserLogin, CreateUser, LoginUser, User},
+    structs::app_state::AppState, utils::session,
 };
 use axum::{
     extract::{Path, State},
@@ -31,17 +31,20 @@ pub async fn get_one(
         }
     }
 }
-pub async fn authorize_user(
+
+pub async fn authenticate(
     State(app_state): State<Arc<AppState>>,
-    Json(body):Json<LoginUser>
+    Json(body): Json<LoginUser>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    let user = sqlx::query_as!(CheckUserLogin, "SELECT email, password_hash FROM users WHERE users.email = $1", body.email)
+    let user = sqlx::query_as!(CheckUserLogin, "SELECT id, email, password_hash FROM users WHERE users.email = $1", body.email)
         .fetch_one(&app_state.db)
         .await;
+
     match user {
         Ok(user) => {
             let is_valid = bcrypt::verify(body.password, &user.password_hash).unwrap();
             if is_valid {
+                let _session_id = session::create(user.id).await;
                 return Ok((StatusCode::OK, Json(json!({"status": "success", "message": "User is authorized"}))));
             } else {
                 return Ok((StatusCode::UNAUTHORIZED, Json(json!({"status": "error", "message": "User is not authorized"}))));
@@ -53,7 +56,6 @@ pub async fn authorize_user(
                 Json(json!({"status": "error","message": format!("{:?}", e)})),
             ));
         }
-        
     }
 }
 
