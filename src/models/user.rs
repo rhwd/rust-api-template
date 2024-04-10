@@ -8,6 +8,13 @@ pub struct User {
     pub email: String,
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct CheckUserLogin {
+    pub id: Uuid,
+    pub email: String,
+    pub password_hash: String
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateUser {
     pub email: String,
@@ -15,12 +22,8 @@ pub struct CreateUser {
     pub password: String
 }
 
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LoginUser {
     pub email: String,
     pub password: String
-}
-
-pub struct CheckUserLogin {
-    pub email: String,
-    pub password_hash: String
 }
