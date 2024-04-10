@@ -12,11 +12,11 @@ use serde_json::json;
 use std::sync::Arc;
 
 pub async fn get_one(
-    State(data): State<Arc<AppState>>,
+    State(app_state): State<Arc<AppState>>,
     Path(id): Path<uuid::Uuid>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     let query_result = sqlx::query_as!(User, "SELECT name, email, id FROM users WHERE users.id = $1", id)
-        .fetch_one(&data.db)
+        .fetch_one(&app_state.db)
         .await;
     match query_result {
         Ok(user) => {
@@ -32,11 +32,11 @@ pub async fn get_one(
     }
 }
 pub async fn authorize_user(
-    State(data): State<Arc<AppState>>,
+    State(app_state): State<Arc<AppState>>,
     Json(body):Json<LoginUser>
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     let user = sqlx::query_as!(CheckUserLogin, "SELECT email, password_hash FROM users WHERE users.email = $1", body.email)
-        .fetch_one(&data.db)
+        .fetch_one(&app_state.db)
         .await;
     match user {
         Ok(user) => {
@@ -58,7 +58,7 @@ pub async fn authorize_user(
 }
 
 pub async fn create(
-    State(data): State<Arc<AppState>>,
+    State(app_state): State<Arc<AppState>>,
     Json(body): Json<CreateUser>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     let password_hash = bcrypt::hash(body.password.to_string(), bcrypt::DEFAULT_COST).unwrap();
@@ -69,7 +69,7 @@ pub async fn create(
         body.email.to_string(),
         password_hash
     )
-    .fetch_one(&data.db)
+    .fetch_one(&app_state.db)
     .await;
 
     match query_result {
