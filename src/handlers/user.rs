@@ -1,6 +1,7 @@
 use crate::{
-    models::user::{ CheckUserLogin, CreateUser, LoginUser, User},
-    structs::app_state::AppState, utils::session,
+    models::user::{CheckUserLogin, CreateUser, LoginUser, User},
+    structs::app_state::AppState,
+    utils::session,
 };
 use axum::{
     extract::{Path, State},
@@ -15,9 +16,13 @@ pub async fn get_one(
     State(app_state): State<Arc<AppState>>,
     Path(id): Path<uuid::Uuid>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    let query_result = sqlx::query_as!(User, "SELECT name, email, id FROM users WHERE users.id = $1", id)
-        .fetch_one(&app_state.db)
-        .await;
+    let query_result = sqlx::query_as!(
+        User,
+        "SELECT name, email, id FROM users WHERE users.id = $1",
+        id
+    )
+    .fetch_one(&app_state.db)
+    .await;
     match query_result {
         Ok(user) => {
             let user_response = json!(user);
@@ -36,21 +41,28 @@ pub async fn authenticate(
     State(app_state): State<Arc<AppState>>,
     Json(body): Json<LoginUser>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    let user = sqlx::query_as!(CheckUserLogin, "SELECT id, email, password_hash FROM users WHERE users.email = $1", body.email)
-        .fetch_one(&app_state.db)
-        .await;
+    let user = sqlx::query_as!(
+        CheckUserLogin,
+        "SELECT id, email, password_hash FROM users WHERE users.email = $1",
+        body.email
+    )
+    .fetch_one(&app_state.db)
+    .await;
 
     match user {
         Ok(user) => {
             let is_valid = bcrypt::verify(body.password, &user.password_hash).unwrap();
             if is_valid {
                 let _session_id = session::create(user.id).await;
-                return Ok((StatusCode::OK, Json(json!({"status": "success", "message": "User is authorized"}))));
+                return Ok((
+                    StatusCode::OK,
+                    Json(json!({"status": "success", "message": "User is authorized"})),
+                ));
             } else {
                 return Err((
                     StatusCode::INTERNAL_SERVER_ERROR,
                     Json(json!({"status": "error","message": "Wrong Credentials"})),
-                ))
+                ));
             }
         }
         Err(e) => {
