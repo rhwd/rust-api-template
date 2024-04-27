@@ -14,7 +14,7 @@ use std::sync::Arc;
 pub async fn get_one(
     State(app_state): State<Arc<AppState>>,
     Path(id): Path<uuid::Uuid>,
-) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<impl IntoResponse, impl IntoResponse> {
     let query_result = sqlx::query_as!(User, "SELECT name, email, id FROM users WHERE users.id = $1", id)
         .fetch_one(&app_state.db)
         .await;
@@ -35,7 +35,7 @@ pub async fn get_one(
 pub async fn authenticate(
     State(app_state): State<Arc<AppState>>,
     Json(body): Json<LoginUser>,
-) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<impl IntoResponse, impl IntoResponse> {
     let user = sqlx::query_as!(CheckUserLogin, "SELECT id, email, password_hash FROM users WHERE users.email = $1", body.email)
         .fetch_one(&app_state.db)
         .await;
@@ -47,7 +47,10 @@ pub async fn authenticate(
                 let _session_id = session::create(user.id).await;
                 return Ok((StatusCode::OK, Json(json!({"status": "success", "message": "User is authorized"}))));
             } else {
-                return Ok((StatusCode::UNAUTHORIZED, Json(json!({"status": "error", "message": "User is not authorized"}))));
+                return Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({"status": "error","message": "Wrong Credentials"})),
+                ))
             }
         }
         Err(e) => {
@@ -62,7 +65,7 @@ pub async fn authenticate(
 pub async fn create(
     State(app_state): State<Arc<AppState>>,
     Json(body): Json<CreateUser>,
-) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<impl IntoResponse, impl IntoResponse> {
     let password_hash = bcrypt::hash(body.password.to_string(), bcrypt::DEFAULT_COST).unwrap();
     let query_result = sqlx::query_as!(
         User,
