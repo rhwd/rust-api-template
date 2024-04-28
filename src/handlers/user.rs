@@ -1,7 +1,7 @@
 use crate::{
     models::user::{CheckUserLogin, CreateUser, LoginUser, User},
     structs::app_state::AppState,
-    utils::session,
+    utils::{session, use_signed_cookies::set_signed_cookie},
 };
 use axum::{
     extract::{Path, State},
@@ -9,6 +9,7 @@ use axum::{
     response::IntoResponse,
     Json,
 };
+
 use serde_json::json;
 use std::sync::Arc;
 
@@ -53,9 +54,11 @@ pub async fn authenticate(
         Ok(user) => {
             let is_valid = bcrypt::verify(body.password, &user.password_hash).unwrap();
             if is_valid {
-                let _session_id = session::create(user.id).await;
+                let session_id = session::create(user.id).await;
+                let cookies = set_signed_cookie("session_id".to_string(), session_id.to_string());
                 return Ok((
                     StatusCode::OK,
+                    cookies,
                     Json(json!({"status": "success", "message": "User is authorized"})),
                 ));
             } else {
