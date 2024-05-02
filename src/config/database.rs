@@ -1,9 +1,8 @@
-use crate::structs::app_state::AppState;
 use dotenv::dotenv;
-use sqlx::postgres::PgPoolOptions;
-use std::sync::Arc;
+use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
-pub async fn connection() -> Arc<AppState> {
+
+pub async fn connection() -> Pool<Postgres> {
     dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = match PgPoolOptions::new()
@@ -21,5 +20,5 @@ pub async fn connection() -> Arc<AppState> {
         }
     };
 
-    Arc::new(AppState { db: pool.clone() })
+    pool.clone()
 }
