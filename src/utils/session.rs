@@ -8,7 +8,7 @@ pub async fn create(user_id: Uuid) -> Uuid{
     let session = sqlx::query!(
         "INSERT INTO sessions (user_id) VALUES ($1) RETURNING *",
         user_id
-    ).fetch_one(&db_pool.db).await;
+    ).fetch_one(&db_pool).await;
 
     match session {
         Ok(session) => {
