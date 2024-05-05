@@ -11,6 +11,6 @@ pub fn create_routes(app_state: Arc<AppState>) -> Router {
     Router::new()
         .route("/users/:id", get(user::get_one))
         .route("/users", post(user::create))
-        .route("/users/login", post(user::authenticate)) 
+        .route("/users/login", post(user::authorize)) 
         .with_state(app_state)
 }

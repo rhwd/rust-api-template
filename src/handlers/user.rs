@@ -39,7 +39,7 @@ pub async fn get_one(
     }
 }
 
-pub async fn authenticate(
+pub async fn authorize(
     State(app_state): State<Arc<AppState>>,
     Json(body): Json<LoginUser>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
