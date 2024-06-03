@@ -106,3 +106,14 @@ pub async fn create(
         }
     }
 }
+
+pub async fn me(
+    State(app_state): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, impl IntoResponse>{
+    println!("{:?}", app_state.signed_jar);
+    if let Some(session_id) = app_state.signed_jar.get("session_id"){
+        Ok(session_id.to_string())
+    } else { 
+        Err(StatusCode::UNAUTHORIZED)
+    }
+}
