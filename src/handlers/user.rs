@@ -10,12 +10,11 @@ use axum::{
     Json,
 };
 
-use axum_extra::extract::cookie::Cookie;
+use axum_extra::extract::{cookie::Cookie, SignedCookieJar};
 use serde_json::json;
-use std::sync::Arc;
 
 pub async fn get_one(
-    State(app_state): State<Arc<AppState>>,
+    State(app_state): State<AppState>,
     Path(id): Path<uuid::Uuid>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let query_result = sqlx::query_as!(
@@ -40,7 +39,7 @@ pub async fn get_one(
 }
 
 pub async fn authorize(
-    State(app_state): State<Arc<AppState>>,
+    State(app_state): State<AppState>,
     Json(body): Json<LoginUser>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let user = sqlx::query_as!(
@@ -59,7 +58,7 @@ pub async fn authorize(
                 
                 return Ok((
                     StatusCode::OK,
-                    app_state.signed_jar.clone().add(Cookie::new("session_id", session_id.to_string())),
+                    SignedCookieJar::new(app_state.key.clone()).add(Cookie::new("session_id", session_id.to_string())),
                     Json(json!({"status": "success", "message": "User is authorized"})),
                 ));
             } else {
@@ -79,7 +78,7 @@ pub async fn authorize(
 }
 
 pub async fn create(
-    State(app_state): State<Arc<AppState>>,
+    State(app_state): State<AppState>,
     Json(body): Json<CreateUser>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let password_hash = bcrypt::hash(body.password.to_string(), bcrypt::DEFAULT_COST).unwrap();
@@ -108,10 +107,9 @@ pub async fn create(
 }
 
 pub async fn me(
-    State(app_state): State<Arc<AppState>>,
+    jar: SignedCookieJar,
 ) -> Result<impl IntoResponse, impl IntoResponse>{
-    println!("{:?}", app_state.signed_jar);
-    if let Some(session_id) = app_state.signed_jar.get("session_id"){
+    if let Some(session_id) = jar.get("session_id"){
         Ok(session_id.to_string())
     } else { 
         Err(StatusCode::UNAUTHORIZED)
