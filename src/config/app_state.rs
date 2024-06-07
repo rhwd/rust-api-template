@@ -1,8 +1,9 @@
-use std::sync::Arc;
-use crate::structs::app_state::AppState;
-use crate::config::{database, signed_cookie_jar}; 
+use axum_extra::extract::cookie::Key;
 
-pub async fn app_state()->Arc<AppState>{
-  let state = Arc::new(AppState {db: database::connection().await, signed_jar: signed_cookie_jar::signed_jar() });
+use crate::structs::app_state::AppState;
+use crate::config::database; 
+
+pub async fn app_state()->AppState{
+  let state = AppState {db: database::connection().await, key: Key::generate() };
   state
 }
