@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT name, email, id FROM users WHERE users.id = (SELECT user_id FROM sessions WHERE id = ($1))",
+  "query": "SELECT name, email, id FROM users WHERE users.id = (SELECT user_id FROM sessions WHERE id = $1)",
   "describe": {
     "columns": [
       {
@@ -30,5 +30,5 @@
       false
     ]
   },
-  "hash": "8cede414f7d0f55d75413989010f21ee20e42048ed7029ca8e0deb777f4ff0a1"
+  "hash": "17686547b8aa0fc01f1afe1907dfec478d1ccdc357d91ce6a0e703ffb32ff80d"
 }
