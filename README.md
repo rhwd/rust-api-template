@@ -63,5 +63,5 @@ To run a your migrations use the command `sqlx migrate run`.
 - Unlike model structs, the structs located here are meant for the internal functions of the app. 
 
 ## Features
-- This template comes with an user `[model]`, `handler` and `routes` setup.
+- This template comes with an user [model](https://github.com/rhwd/rust-api-template?tab=readme-ov-file#models), [handler](https://github.com/rhwd/rust-api-template?tab=readme-ov-file#handlers) and [routes](https://github.com/rhwd/rust-api-template?tab=readme-ov-file#routes) setup.
 - User has a simple signed cookie based authentication setup.
